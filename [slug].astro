@@ -1,0 +1,45 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getStories, getStory, img, fmtDate, bodyHtml, CATEGORIES } from "../../lib/sanity";
+export async function getStaticPaths() {
+  const stories = await getStories();
+  return stories.map((s) => ({ params: { slug: s.slug } }));
+}
+const story = await getStory(Astro.params.slug!);
+const related = (await getStories()).filter((s) => s.category === story.category && s.slug !== story.slug).slice(0, 3);
+---
+<Base title={`${story.title} | The Curious Pitch`} description={story.excerpt}>
+  <div class="progress" id="bar"></div>
+  <article>
+    <a class="tag" href={`/category/${story.category}`}>{CATEGORIES[story.category]}</a>
+    <h1>{story.title}</h1>
+    <p class="meta">{fmtDate(story.publishedAt)}{story.readTime ? `, ${story.readTime} min read` : ""}</p>
+    {story.coverImage && <img class="cover" src={img(story.coverImage, 1200)} alt={story.coverImage.alt || story.title} />}
+    <div class="prose" set:html={bodyHtml(story.body)} />
+    {story.verdict && (
+      <div class="verdict">
+        <h3>The Curious Pitch verdict</h3>
+        <p>{story.verdict}</p>
+      </div>
+    )}
+  </article>
+  {related.length > 0 && (
+    <>
+      <h2 class="sec">More like this</h2>
+      <div class="grid">
+        {related.map((s) => (
+          <a class="card" href={`/stories/${s.slug}`}>
+            <div class="txt"><h3>{s.title}</h3><p>{s.excerpt}</p></div>
+          </a>
+        ))}
+      </div>
+    </>
+  )}
+  <script>
+    const bar = document.getElementById("bar");
+    addEventListener("scroll", () => {
+      const h = document.documentElement;
+      if (bar) bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100 + "%";
+    }, { passive: true });
+  </script>
+</Base>

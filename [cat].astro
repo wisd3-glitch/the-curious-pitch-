@@ -1,0 +1,28 @@
+---
+import Base from "../../layouts/Base.astro";
+import { getStories, img, fmtDate, CATEGORIES } from "../../lib/sanity";
+export function getStaticPaths() {
+  return Object.keys(CATEGORIES).map((cat) => ({ params: { cat } }));
+}
+const { cat } = Astro.params;
+const stories = (await getStories()).filter((s) => s.category === cat);
+---
+<Base title={`${CATEGORIES[cat!]} | The Curious Pitch`}>
+  <section class="hero"><h1>{CATEGORIES[cat!]}</h1></section>
+  {stories.length === 0 ? (
+    <p class="empty">No stories in this category yet.</p>
+  ) : (
+    <div class="grid">
+      {stories.map((s) => (
+        <a class="card" href={`/stories/${s.slug}`}>
+          <div class="pic">{s.coverImage && <img src={img(s.coverImage, 600)} alt={s.title} loading="lazy" />}</div>
+          <div class="txt">
+            <h3>{s.title}</h3>
+            <p>{s.excerpt}</p>
+            <span class="meta">{fmtDate(s.publishedAt)}</span>
+          </div>
+        </a>
+      ))}
+    </div>
+  )}
+</Base>

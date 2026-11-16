@@ -1,0 +1,45 @@
+---
+import Base from "../layouts/Base.astro";
+import { getStories, img, fmtDate, CATEGORIES } from "../lib/sanity";
+const stories = await getStories();
+const lead = stories.find((s) => s.featured) || stories[0];
+const rest = stories.filter((s) => s !== lead);
+---
+<Base>
+  <section class="hero">
+    <h1>Football's big questions, asked properly.</h1>
+    <div class="chips">
+      {Object.entries(CATEGORIES).map(([k, v]) => <a href={`/category/${k}`}>{v}</a>)}
+    </div>
+  </section>
+
+  {lead ? (
+    <a class="featured" href={`/stories/${lead.slug}`}>
+      <span class="tag">{CATEGORIES[lead.category]}</span>
+      <h2>{lead.title}</h2>
+      <p>{lead.excerpt}</p>
+      <p class="meta">{fmtDate(lead.publishedAt)}{lead.readTime ? `, ${lead.readTime} min read` : ""}</p>
+    </a>
+  ) : (
+    <p class="empty">No stories yet. Open /studio, tap New Story, and publish your first one.</p>
+  )}
+
+  {rest.length > 0 && (
+    <>
+      <h2 class="sec">Latest stories</h2>
+      <div class="grid">
+        {rest.map((s) => (
+          <a class="card" href={`/stories/${s.slug}`}>
+            <div class="pic">{s.coverImage && <img src={img(s.coverImage, 600)} alt={s.coverImage.alt || s.title} loading="lazy" />}</div>
+            <div class="txt">
+              <span class="tag">{CATEGORIES[s.category]}</span>
+              <h3>{s.title}</h3>
+              <p>{s.excerpt}</p>
+              <span class="meta">{fmtDate(s.publishedAt)}</span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </>
+  )}
+</Base>
