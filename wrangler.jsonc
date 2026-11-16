@@ -1,5 +1,6 @@
 {
-  "name": "the-curious-pitch",
+  // wrangler.jsonc
+"name": "thecuriouspitch",
   "compatibility_date": "2026-11-01",
   "assets": {
     "directory": "./dist",
