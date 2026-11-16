@@ -1,0 +1,24 @@
+---
+import Base from '../../layouts/Base.astro';
+import PostCard from '../../components/PostCard.astro';
+import { CATEGORIES, getStories } from '../../lib/sanity';
+
+export function getStaticPaths() {
+  return CATEGORIES.map((c) => ({ params: { slug: c.slug }, props: { cat: c } }));
+}
+
+const { cat } = Astro.props;
+const stories = (await getStories()).filter((s) => s.category === cat.slug);
+---
+<Base title={cat.title} description={`${cat.title}: ${cat.blurb}. Stories from The Curious Pitch.`}>
+  <section class="wrap pagehead">
+    <small>Topic</small>
+    <h1>{cat.title}</h1>
+    <p>{cat.blurb}</p>
+  </section>
+  <section><div class="wrap">
+    {stories.length > 0
+      ? <div class="grid">{stories.map((s) => <PostCard story={s} />)}</div>
+      : <p class="empty">No stories in this topic yet.</p>}
+  </div></section>
+</Base>
