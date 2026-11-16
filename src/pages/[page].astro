@@ -1,0 +1,19 @@
+---
+import Base from '../layouts/Base.astro';
+import { PAGES } from '../lib/pages';
+
+export function getStaticPaths() {
+  return Object.keys(PAGES).map((page) => ({ params: { page }, props: PAGES[page] }));
+}
+
+const { title, description, html } = Astro.props;
+---
+<Base title={title} description={description}>
+  <section class="wrap pagehead">
+    <small>The Curious Pitch</small>
+    <h1>{title}</h1>
+  </section>
+  <section style="padding-top:20px"><div class="wrap">
+    <div class="prose" style="max-width:720px;font-size:18px" set:html={html} />
+  </div></section>
+</Base>
