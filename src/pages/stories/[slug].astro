@@ -1,45 +1,55 @@
 ---
-import Base from "../../layouts/Base.astro";
-import { getStories, getStory, img, fmtDate, bodyHtml, CATEGORIES } from "../../lib/sanity";
+import Base from '../../layouts/Base.astro';
+import { getStories, getStory, catTitle, fmtDate, readMinutes, renderBody } from '../../lib/sanity';
+
 export async function getStaticPaths() {
   const stories = await getStories();
   return stories.map((s) => ({ params: { slug: s.slug } }));
 }
-const story = await getStory(Astro.params.slug!);
-const related = (await getStories()).filter((s) => s.category === story.category && s.slug !== story.slug).slice(0, 3);
+
+const { slug } = Astro.params;
+const story = await getStory(slug);
+const all = await getStories();
+const others = all.filter((s) => s._id !== story._id);
+const related = [...others.filter((s) => s.category === story.category), ...others.filter((s) => s.category !== story.category)].slice(0, 3);
+const mins = readMinutes(story);
+const og = story.cover ? `${story.cover}?w=1200&h=630&fit=crop&auto=format` : undefined;
 ---
-<Base title={`${story.title} | The Curious Pitch`} description={story.excerpt}>
-  <div class="progress" id="bar"></div>
-  <article>
-    <a class="tag" href={`/category/${story.category}`}>{CATEGORIES[story.category]}</a>
-    <h1>{story.title}</h1>
-    <p class="meta">{fmtDate(story.publishedAt)}{story.readTime ? `, ${story.readTime} min read` : ""}</p>
-    {story.coverImage && <img class="cover" src={img(story.coverImage, 1200)} alt={story.coverImage.alt || story.title} />}
-    <div class="prose" set:html={bodyHtml(story.body)} />
-    {story.verdict && (
-      <div class="verdict">
-        <h3>The Curious Pitch verdict</h3>
-        <p>{story.verdict}</p>
+<Base title={story.title} description={story.excerpt} image={og} article>
+  <div class="wrap">
+    <article class="art">
+      <a class="back" href="/">Back to home</a><br />
+      <a class="tag" href={`/category/${story.category}`}>{story.series ?? catTitle(story.category)}</a>
+      <h1>{story.title}</h1>
+      <div class="by">By The Curious Pitch. {fmtDate(story.publishedAt)}.{mins ? ` ${mins} min read.` : ''}</div>
+      <div class="cover">
+        {story.cover && <img src={`${story.cover}?w=1400&auto=format`} alt={story.coverAlt ?? ''} />}
       </div>
-    )}
-  </article>
-  {related.length > 0 && (
-    <>
-      <h2 class="sec">More like this</h2>
-      <div class="grid">
-        {related.map((s) => (
-          <a class="card" href={`/stories/${s.slug}`}>
-            <div class="txt"><h3>{s.title}</h3><p>{s.excerpt}</p></div>
-          </a>
-        ))}
+      <div class="prose" set:html={renderBody(story.body)} />
+      <div class="prose">
+        {story.keyFigure && (
+          <div class="stat"><b>{story.keyFigure}</b><span>{story.keyFigureNote}</span></div>
+        )}
+        {story.verdict && (
+          <div class="verdict">
+            <h3>The Curious Pitch verdict</h3>
+            {story.verdict.split(/\n+/).map((p: string) => <p>{p}</p>)}
+          </div>
+        )}
       </div>
-    </>
-  )}
-  <script>
-    const bar = document.getElementById("bar");
-    addEventListener("scroll", () => {
-      const h = document.documentElement;
-      if (bar) bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight || 1)) * 100 + "%";
-    }, { passive: true });
-  </script>
+      {story.closingQuestion && (
+        <div class="ask"><h3>{story.closingQuestion}</h3><p>Tell us what you think. Share this story and start the debate.</p></div>
+      )}
+      <div class="share">
+        <button id="copy" type="button">Copy link</button>
+        <a id="wa" href="#" target="_blank" rel="noopener">Share on WhatsApp</a>
+      </div>
+      {related.length > 0 && (
+        <div class="rel">
+          <h2>Keep reading</h2>
+          {related.map((s) => <a href={`/story/${s.slug}`}>{s.title}</a>)}
+        </div>
+      )}
+    </article>
+  </div>
 </Base>
