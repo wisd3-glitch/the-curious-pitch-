@@ -1,0 +1,15 @@
+---
+import { catTitle, readMinutes } from '../lib/sanity';
+const { story } = Astro.props;
+const mins = readMinutes(story);
+---
+<a class="post" href={`/story/${story.slug}`}>
+  <div class="thumb">
+    {story.cover && <img src={`${story.cover}?w=300&h=300&fit=crop&auto=format`} alt={story.coverAlt ?? ''} loading="lazy" />}
+  </div>
+  <div>
+    <small>{catTitle(story.category)}</small>
+    <h3>{story.title}</h3>
+    {mins && <small>{mins} min read</small>}
+  </div>
+</a>
