@@ -1,6 +1,5 @@
-// Replace these two before launch:
-export const EMAIL = 'REPLACE-WITH-YOUR-EMAIL';
-const NAME = 'REPLACE-WITH-YOUR-NAME-OR-TEAM';
+export const EMAIL = 'kumijewisdom7@gmail.com';
+const NAME = 'Kumije Wisdom H.';
 const UPDATED = 'November 2026';
 const mail = `<a href="mailto:${EMAIL}">${EMAIL}</a>`;
 
