@@ -1,0 +1,23 @@
+{
+  "name": "the-curious-pitch",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "@astrojs/react": "latest",
+    "@portabletext/to-html": "latest",
+    "@sanity/astro": "latest",
+    "@sanity/image-url": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "astro": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "sanity": "latest",
+    "styled-components": "latest"
+  }
+}
